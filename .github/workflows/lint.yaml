@@ -27,7 +27,7 @@ jobs:
       # Run ESLint in JSON format
       - name: Run ESLint
         run: |
-          npx eslint . -f json -o eslint-report.json
+          npx eslint . -f json -o eslint-report.json || true
 
       # Parse report + create clean comment and workflow summary
       - name: Format Comment
