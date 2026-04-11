@@ -40,6 +40,26 @@ jobs:
           fi
           echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
 
+      - name: Store Coverage History
+        run: |
+          COVERAGE=${{ steps.coverage.outputs.coverage }}
+                  # Create file if not exists
+          if [ ! -f coverage-history.json ]; then
+            echo "[]" > coverage-history.json
+          fi
+                  # Append new entry with timestamp
+          jq ". + [{\"date\": \"$(date +%F)\", \"coverage\": $COVERAGE}]" coverage-history.json > temp.json
+          mv temp.json coverage-history.json
+
+      - name: Commit Coverage History
+        if: github.event_name != 'pull_request'
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add coverage-history.json
+          git commit -m "Update coverage history" || echo "No changes"
+          git push
+      
       # ❌ Enforce minimum coverage
       - name: Enforce Coverage Threshold
         run: |
