@@ -24,10 +24,10 @@ jobs:
 
       - run: npm install
 
-      - name: Run ESLint and capture output
-        id: lint
+      # Run ESLint in JSON format
+      - name: Run ESLint
         run: |
-          npm run lint > lint.txt || true
+          npx eslint . -f json -o eslint-report.json || true
 
       # Parse report + create clean comment and workflow summary
       - name: Format Comment
