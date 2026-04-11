@@ -24,3 +24,10 @@ function tooHigh() {
 function correct() {
   document.getElementById("guess").innerText = `🎉 I guessed it! It's ${guess}`;
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("startBtn").addEventListener("click", startGame);
+  document.getElementById("tooLowBtn").addEventListener("click", tooLow);
+  document.getElementById("tooHighBtn").addEventListener("click", tooHigh);
+  document.getElementById("correctBtn").addEventListener("click", correct);
+});
