@@ -1,0 +1,104 @@
+name: Test & Coverage
+
+on:
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+  schedule:
+    - cron: "0 23 * * 0"  # Sunday 11 PM UTC
+
+permissions:
+  contents: write        # needed for badge commit
+  pull-requests: write
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      # 🧪 Run tests with coverage
+      - name: Run Tests
+        run: npm run test:coverage
+
+      # 📊 Extract coverage %
+      - name: Extract Coverage
+        id: coverage
+        run: |
+          COVERAGE=$(cat coverage/coverage-summary.json | jq '.total.lines.pct')
+          echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
+
+      # ❌ Enforce minimum coverage
+      - name: Enforce Coverage Threshold
+        run: |
+          if (( $(echo "${{ steps.coverage.outputs.coverage }} < 40" | bc -l) )); then
+            echo "❌ Coverage below 40%"
+            exit 1
+          fi
+
+      # 🏷️ Update README badge
+      - name: Update Coverage Badge
+        if: github.event_name != 'pull_request'
+        run: |
+          COVERAGE=${{ steps.coverage.outputs.coverage }}
+
+          if (( $(echo "$COVERAGE >= 80" | bc -l) )); then
+            COLOR="brightgreen"
+          elif (( $(echo "$COVERAGE >= 60" | bc -l) )); then
+            COLOR="yellow"
+          else
+            COLOR="red"
+          fi
+
+          BADGE="![Coverage](https://img.shields.io/badge/coverage-${COVERAGE}%25-${COLOR})"
+
+          if grep -q "!\[Coverage\]" README.md; then
+            sed -i "s|!\[Coverage\].*|$BADGE|" README.md
+          else
+            echo "$BADGE" >> README.md
+          fi
+
+      - name: Commit Badge
+        if: github.event_name != 'pull_request'
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add README.md
+          git commit -m "Update coverage badge" || echo "No changes"
+          git push
+
+      # 🧾 Create report
+      - name: Format Report
+        run: |
+          COVERAGE=${{ steps.coverage.outputs.coverage }}
+
+          echo "### 🧪 Test Coverage Report" > report.md
+          echo "" >> report.md
+          echo "📊 Coverage: **$COVERAGE%**" >> report.md
+
+          if (( $(echo "$COVERAGE >= 40" | bc -l) )); then
+            echo "✅ Above minimum threshold" >> report.md
+          else
+            echo "❌ Below minimum threshold" >> report.md
+          fi
+
+      # 💬 PR comment (only for PR)
+      - name: Comment PR
+        if: github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          path: report.md
+
+      # 🧾 Workflow summary (manual/scheduled)
+      - name: Add to Workflow Summary
+        if: github.event_name != 'pull_request'
+        run: |
+          cat report.md >> $GITHUB_STEP_SUMMARY
