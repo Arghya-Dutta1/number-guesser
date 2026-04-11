@@ -2,7 +2,10 @@ name: Lint Check
 
 on:
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
+  workflow_dispatch:
+  schedule:
+    - cron: "0 23 * * FRI"
 
 permissions:
   contents: read
@@ -17,7 +20,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: "18"
 
       - run: npm install
 
@@ -26,7 +29,59 @@ jobs:
         run: |
           npm run lint > lint.txt || true
 
+      # Parse report + create clean comment and workflow summary
+      - name: Format Comment
+        id: format
+        run: |
+          ERRORS=$(cat eslint-report.json | jq '[.[].errorCount] | add')
+          WARNINGS=$(cat eslint-report.json | jq '[.[].warningCount] | add')
+
+          if [ "$ERRORS" -eq 0 ]; then
+            STATUS="✅ No lint errors!"
+          else
+            STATUS="❌ Lint errors found"
+          fi
+
+          echo "### 🧹 Lint Report" > comment.md
+          echo "" >> comment.md
+          echo "**Status:** $STATUS" >> comment.md
+          echo "" >> comment.md
+          echo "- ❌ Errors: $ERRORS" >> comment.md
+          echo "- ⚠️ Warnings: $WARNINGS" >> comment.md
+          echo "" >> comment.md
+
+          echo "<details><summary>🔍 View Details</summary>" >> comment.md
+          echo "" >> comment.md
+          echo '```json' >> comment.md
+          cat eslint-report.json >> comment.md
+          echo '```' >> comment.md
+          echo "</details>" >> comment.md
+
+          echo "### 🧹 Lint Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Status:** $STATUS" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- ❌ Errors: $ERRORS" >> $GITHUB_STEP_SUMMARY
+          echo "- ⚠️ Warnings: $WARNINGS" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "<details><summary>🔍 View Details</summary>" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo '```json' >> $GITHUB_STEP_SUMMARY
+          cat eslint-report.json >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "</details>" >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload lint report
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-report
+          path: |
+            eslint-report.json
+            comment.md
+
+      # Post comment only for pull requests
       - name: Comment PR
+        if: github.event_name == 'pull_request'
         uses: marocchino/sticky-pull-request-comment@v2
         with:
-          path: lint.txt
+          path: comment.md
