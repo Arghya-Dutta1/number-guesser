@@ -21,12 +21,41 @@ jobs:
 
       - run: npm install
 
-      - name: Run ESLint and capture output
-        id: lint
+      # Run ESLint in JSON format
+      - name: Run ESLint
         run: |
-          npm run lint > lint.txt || true
+          npx eslint . -f json -o eslint-report.json || true
 
+      # Parse report + create clean comment
+      - name: Format Comment
+        id: format
+        run: |
+          ERRORS=$(cat eslint-report.json | jq '[.[].errorCount] | add')
+          WARNINGS=$(cat eslint-report.json | jq '[.[].warningCount] | add')
+
+          if [ "$ERRORS" -eq 0 ]; then
+            STATUS="✅ No lint errors!"
+          else
+            STATUS="❌ Lint errors found"
+          fi
+
+          echo "### 🧹 Lint Report" > comment.md
+          echo "" >> comment.md
+          echo "**Status:** $STATUS" >> comment.md
+          echo "" >> comment.md
+          echo "- ❌ Errors: $ERRORS" >> comment.md
+          echo "- ⚠️ Warnings: $WARNINGS" >> comment.md
+          echo "" >> comment.md
+
+          echo "<details><summary>🔍 View Details</summary>" >> comment.md
+          echo "" >> comment.md
+          echo '```json' >> comment.md
+          cat eslint-report.json >> comment.md
+          echo '```' >> comment.md
+          echo "</details>" >> comment.md
+
+      # Post comment
       - name: Comment PR
         uses: marocchino/sticky-pull-request-comment@v2
         with:
-          path: lint.txt
+          path: comment.md
