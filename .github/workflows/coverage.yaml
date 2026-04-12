@@ -27,7 +27,7 @@ jobs:
 
       # 🧪 Run tests with coverage
       - name: Run Tests
-        run: npm run test:coverage
+        run: npm run test:coverage -- --coverageReporters=json-summary
 
       # 📊 Extract coverage %
       - name: Extract Coverage
@@ -59,7 +59,7 @@ jobs:
           git add coverage-history.json
           git commit -m "Update coverage history" || echo "No changes"
           git push
-      
+
       # ❌ Enforce minimum coverage
       - name: Enforce Coverage Threshold
         run: |
