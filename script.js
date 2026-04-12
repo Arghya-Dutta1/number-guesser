@@ -3,8 +3,8 @@ import {
   getMid,
   isValidLowUpdate,
   isValidHighUpdate,
-  isRangeValid
-} from './logic.js';
+  isRangeValid,
+} from "./logic.js";
 
 let low, high, guess;
 let attempts;
@@ -76,8 +76,7 @@ function tooHigh() {
 
 // Correct guess
 function correct() {
-  document.getElementById("guess").innerText =
-    `🎉 Got it! It's ${guess}`;
+  document.getElementById("guess").innerText = `🎉 Got it! It's ${guess}`;
 
   updateInfo(`Solved in ${attempts} attempts!`);
 }
@@ -96,3 +95,10 @@ function updateInfo(message) {
 function showError(msg) {
   document.getElementById("error").innerText = msg;
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("startBtn").addEventListener("click", startGame);
+  document.getElementById("tooLowBtn").addEventListener("click", tooLow);
+  document.getElementById("tooHighBtn").addEventListener("click", tooHigh);
+  document.getElementById("correctBtn").addEventListener("click", correct);
+});

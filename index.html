@@ -1,36 +1,35 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>AI Number Guesser</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <title>AI Number Guesser</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>🤖 AI Number Guesser</h1>
+      <p>Think of a number between <b>1</b> and <b>100</b></p>
 
-  <div class="container">
-    <h1>🤖 AI Number Guesser</h1>
-    <p>Think of a number between <b>1</b> and <b>100</b></p>
+      <div class="card">
+        <h2 id="guess">Press Start</h2>
+        <p id="info">AI is ready...</p>
 
-    <div class="card">
-      <h2 id="guess">Press Start</h2>
-      <p id="info">AI is ready...</p>
-
-      <div class="stats">
-        <span>📊 Range: <span id="range">1 - 100</span></span>
-        <span>🎯 Attempts: <span id="attempts">0</span></span>
+        <div class="stats">
+          <span>📊 Range: <span id="range">1 - 100</span></span>
+          <span>🎯 Attempts: <span id="attempts">0</span></span>
+        </div>
       </div>
+
+      <div class="buttons">
+        <button id="startBtn" class="start">Start</button>
+        <button id="tooLowBtn">Too Low 📉</button>
+        <button id="tooHighBtn">Too High 📈</button>
+        <button id="correctBtn" class="correct">Correct ✅</button>
+      </div>
+
+      <p id="error" class="error"></p>
     </div>
 
-    <div class="buttons">
-      <button class="start" onclick="startGame()">Start</button>
-      <button onclick="tooLow()">Too Low 📉</button>
-      <button onclick="tooHigh()">Too High 📈</button>
-      <button class="correct" onclick="correct()">Correct ✅</button>
-    </div>
-
-    <p id="error" class="error"></p>
-  </div>
-
-  <script src="script.js"></script>
-</body>
+    <script type="module" src="script.js"></script>
+  </body>
 </html>
