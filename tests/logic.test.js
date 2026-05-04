@@ -12,13 +12,13 @@ describe("Game Logic Tests", () => {
     expect(getMid(1, 99)).toBe(50);
   });
 
-  // test("random guess is within range", () => {
-  //   for (let i = 0; i < 10; i++) {
-  //     const val = getRandomGuess(1, 100);
-  //     expect(val).toBeGreaterThanOrEqual(1);
-  //     expect(val).toBeLessThanOrEqual(100);
-  //   }
-  // });
+  test("random guess is within range", () => {
+    for (let i = 0; i < 10; i++) {
+      const val = getRandomGuess(1, 100);
+      expect(val).toBeGreaterThanOrEqual(1);
+      expect(val).toBeLessThanOrEqual(100);
+    }
+  });
 
   // test("valid low update", () => {
   //   expect(isValidLowUpdate(50, 100)).toBe(true);
