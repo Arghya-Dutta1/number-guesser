@@ -30,8 +30,8 @@ describe("Game Logic Tests", () => {
   //   expect(isValidHighUpdate(1, 1)).toBe(false);
   // });
 
-  // test("range validity", () => {
-  //   expect(isRangeValid(1, 100)).toBe(true);
-  //   expect(isRangeValid(50, 40)).toBe(false);
-  // });
+  test("range validity", () => {
+    expect(isRangeValid(1, 100)).toBe(true);
+    expect(isRangeValid(50, 40)).toBe(false);
+  });
 });
