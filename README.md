@@ -118,7 +118,7 @@ npm run test:coverage
 
 ## 📊 Coverage Badge
 
-![Coverage](https://img.shields.io/badge/coverage-40%25-red)
+![Coverage](https://img.shields.io/badge/coverage-60%25-yellow)
 
 (Auto-updated via GitHub Actions)
 
